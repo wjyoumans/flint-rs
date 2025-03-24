@@ -5,7 +5,7 @@ Rust bindings to the [FLINT](http://flintlib.org/) library.
 FLINT (Fast Library for Number Theory) is a C library which provides a number
 of number theoretic and algebraic functions and types.
 
-Many aspects of `flint-sys` are inspired by the `gmp-mpfr-sys` library.
+Also see [`gmp-mpfr-sys`](https://crates.io/crates/gmp-mpfr-sys) for GMP, MPFR, and MPC bindings.
 
 ## Usage
 
@@ -18,14 +18,13 @@ See the [documentation](https://docs.rs/flint-sys/latest/flint_sys/). This crate
 ## Caching
 Built libraries are cached in the user’s cache directory as follows:
 
-  * GNU/Linux: inside $XDG_CACHE_HOME/gmp-mpfr-sys or
-$HOME/.cache/gmp-mpfr-sys
+  * GNU/Linux: inside $XDG_CACHE_HOME/flint-sys or $HOME/.cache/flint-sys
 
-  * macOS: inside $HOME/Library/Caches/gmp-mpfr-sys
-
-  * Windows: inside {FOLDERID_LocalAppData}\gmp-mpfr-sys
+  * macOS: inside $HOME/Library/Caches/flint-sys
 
 ## Notes
+
+  * Windows is not currently supported.
 
   * WSL users may need to install clang.
  
