@@ -1,7 +1,6 @@
 // Adapted from https://gitlab.com/tspiteri/gmp-mpfr-sys/-/blob/master/build.rs
 // Also see https://github.com/rust-lang/rust-bindgen/discussions/2405
 
-
 use std::{
     env,
     ffi::{OsStr, OsString},
@@ -12,10 +11,12 @@ use std::{
     str,
 };
 
-const FLINT_DIR: &str = "flint-3.1.2";
+const FLINT_DIR: &str = "flint-3.3.1";
 const FLINT_LIB: &str = "libflint.a";
-const FLINT_VER: &str = "3.1.2";
+const FLINT_VER: &str = "3.3.1";
+
 const FLINT_HEADERS: &[&str] = &[
+    "NTL-interface.h",
     "acb.h",
     "acb_calc.h",
     "acb_dft.h",
@@ -48,8 +49,11 @@ const FLINT_HEADERS: &[&str] = &[
     "ca_field.h",
     "ca_mat.h",
     "ca_poly.h",
+    "ca_types.h",
     "ca_vec.h",
     "calcium.h",
+    "config.h",
+    "crt_helpers.h",
     "d_mat.h",
     "d_vec.h",
     "dirichlet.h",
@@ -59,8 +63,9 @@ const FLINT_HEADERS: &[&str] = &[
     "fexpr.h",
     "fexpr_builtin.h",
     "fft.h",
-    "fft_tuning.h",
+    "fft_small.h",
     "flint-config.h",
+    "flint-mparam.h",
     "flint.h",
     "fmpq.h",
     "fmpq_mat.h",
@@ -127,6 +132,7 @@ const FLINT_HEADERS: &[&str] = &[
     "fq_zech_poly_factor.h",
     "fq_zech_types.h",
     "fq_zech_vec.h",
+    "gettimeofday.h",
     "gmpcompat.h",
     "gr.h",
     "gr_generic.h",
@@ -134,23 +140,32 @@ const FLINT_HEADERS: &[&str] = &[
     "gr_mpoly.h",
     "gr_poly.h",
     "gr_special.h",
+    "gr_types.h",
     "gr_vec.h",
     "hypgeom.h",
     "limb_types.h",
     "long_extras.h",
     "longlong.h",
     "longlong_asm_clang.h",
+    "longlong_asm_gcc.h",
+    "longlong_asm_gnu.h",
     "longlong_div_gnu.h",
+    "longlong_msc_arm64.h",
+    "longlong_msc_x86.h",
+    "machine_vectors.h",
     "mag.h",
     "mpf-impl.h",
     "mpfr_mat.h",
     "mpfr_vec.h",
+    "mpn_extras.h",
+    "mpn_mod.h",
     "mpoly.h",
     "mpoly_types.h",
     "n_poly.h",
     "n_poly_types.h",
     "nf.h",
     "nf_elem.h",
+    "nfloat.h",
     "nmod.h",
     "nmod_mat.h",
     "nmod_mpoly.h",
@@ -166,15 +181,186 @@ const FLINT_HEADERS: &[&str] = &[
     "padic_types.h",
     "partitions.h",
     "perm.h",
+    "profiler.h",
     "qadic.h",
     "qfb.h",
     "qqbar.h",
     "qsieve.h",
     "templates.h",
+    "test_helpers.h",
     "thread_pool.h",
     "thread_support.h",
     "ulong_extras.h",
 ];
+
+// const FLINT_HEADERS: &[&str] = &[
+//     "acb.h",
+//     "acb_calc.h",
+//     "acb_dft.h",
+//     "acb_dirichlet.h",
+//     "acb_elliptic.h",
+//     "acb_hypgeom.h",
+//     "acb_mat.h",
+//     "acb_modular.h",
+//     "acb_poly.h",
+//     "acb_theta.h",
+//     "acb_types.h",
+//     "acf.h",
+//     "acf_types.h",
+//     "aprcl.h",
+//     "arb.h",
+//     "arb_calc.h",
+//     "arb_fmpz_poly.h",
+//     "arb_fpwrap.h",
+//     "arb_hypgeom.h",
+//     "arb_mat.h",
+//     "arb_poly.h",
+//     "arb_types.h",
+//     "arf.h",
+//     "arf_types.h",
+//     "arith.h",
+//     "bernoulli.h",
+//     "bool_mat.h",
+//     "ca.h",
+//     "ca_ext.h",
+//     "ca_field.h",
+//     "ca_mat.h",
+//     "ca_poly.h",
+//     "ca_types.h",
+//     "ca_vec.h",
+//     "calcium.h",
+//     "config.h",
+//     "d_mat.h",
+//     "d_vec.h",
+//     "dirichlet.h",
+//     "dlog.h",
+//     "double_extras.h",
+//     "double_interval.h",
+//     "fexpr.h",
+//     "fexpr_builtin.h",
+//     "fft.h",
+//     "flint-config.h",
+//     "flint-mparam.h",
+//     "flint.h",
+//     "fmpq.h",
+//     "fmpq_mat.h",
+//     "fmpq_mpoly.h",
+//     "fmpq_mpoly_factor.h",
+//     "fmpq_poly.h",
+//     "fmpq_types.h",
+//     "fmpq_vec.h",
+//     "fmpz.h",
+//     "fmpz_extras.h",
+//     "fmpz_factor.h",
+//     "fmpz_lll.h",
+//     "fmpz_mat.h",
+//     "fmpz_mod.h",
+//     "fmpz_mod_mat.h",
+//     "fmpz_mod_mpoly.h",
+//     "fmpz_mod_mpoly_factor.h",
+//     "fmpz_mod_poly.h",
+//     "fmpz_mod_poly_factor.h",
+//     "fmpz_mod_types.h",
+//     "fmpz_mod_vec.h",
+//     "fmpz_mpoly.h",
+//     "fmpz_mpoly_factor.h",
+//     "fmpz_mpoly_q.h",
+//     "fmpz_poly.h",
+//     "fmpz_poly_factor.h",
+//     "fmpz_poly_mat.h",
+//     "fmpz_poly_q.h",
+//     "fmpz_types.h",
+//     "fmpz_vec.h",
+//     "fmpzi.h",
+//     "fq.h",
+//     "fq_default.h",
+//     "fq_default_mat.h",
+//     "fq_default_poly.h",
+//     "fq_default_poly_factor.h",
+//     "fq_embed.h",
+//     "fq_embed_templates.h",
+//     "fq_mat.h",
+//     "fq_mat_templates.h",
+//     "fq_nmod.h",
+//     "fq_nmod_embed.h",
+//     "fq_nmod_mat.h",
+//     "fq_nmod_mpoly.h",
+//     "fq_nmod_mpoly_factor.h",
+//     "fq_nmod_poly.h",
+//     "fq_nmod_poly_factor.h",
+//     "fq_nmod_types.h",
+//     "fq_nmod_vec.h",
+//     "fq_poly.h",
+//     "fq_poly_factor.h",
+//     "fq_poly_factor_templates.h",
+//     "fq_poly_templates.h",
+//     "fq_templates.h",
+//     "fq_types.h",
+//     "fq_vec.h",
+//     "fq_vec_templates.h",
+//     "fq_zech.h",
+//     "fq_zech_embed.h",
+//     "fq_zech_mat.h",
+//     "fq_zech_mpoly.h",
+//     "fq_zech_mpoly_factor.h",
+//     "fq_zech_poly.h",
+//     "fq_zech_poly_factor.h",
+//     "fq_zech_types.h",
+//     "fq_zech_vec.h",
+//     "gmpcompat.h",
+//     "gr.h",
+//     "gr_generic.h",
+//     "gr_mat.h",
+//     "gr_mpoly.h",
+//     "gr_poly.h",
+//     "gr_special.h",
+//     "gr_types.h",
+//     "gr_vec.h",
+//     "hypgeom.h",
+//     "limb_types.h",
+//     "long_extras.h",
+//     "longlong.h",
+//     "longlong_asm_clang.h",
+//     "longlong_asm_gnu.h",
+//     "longlong_div_gnu.h",
+//     "mag.h",
+//     "mpf-impl.h",
+//     "mpfr_mat.h",
+//     "mpfr_vec.h",
+//     "mpn_extras.h",
+//     "mpn_mod.h",
+//     "mpoly.h",
+//     "mpoly_types.h",
+//     "n_poly.h",
+//     "n_poly_types.h",
+//     "nf.h",
+//     "nf_elem.h",
+//     "nfloat.h",
+//     "nmod.h",
+//     "nmod_mat.h",
+//     "nmod_mpoly.h",
+//     "nmod_mpoly_factor.h",
+//     "nmod_poly.h",
+//     "nmod_poly_factor.h",
+//     "nmod_poly_mat.h",
+//     "nmod_types.h",
+//     "nmod_vec.h",
+//     "padic.h",
+//     "padic_mat.h",
+//     "padic_poly.h",
+//     "padic_types.h",
+//     "partitions.h",
+//     "perm.h",
+//     "qadic.h",
+//     "qfb.h",
+//     "qqbar.h",
+//     "qsieve.h",
+//     "templates.h",
+//     "test_helpers.h",
+//     "thread_pool.h",
+//     "thread_support.h",
+//     "ulong_extras.h",
+// ];
 
 #[derive(Clone, Copy, PartialEq)]
 enum Target {
@@ -230,7 +416,7 @@ fn main() {
         }
     };
     let cache_dir = cache_dir
-        .map(|cache| cache.join(&FLINT_VER))
+        .map(|cache| cache.join(FLINT_VER))
         .map(|cache| match cc_cache_dir {
             Some(dir) => cache.join(dir),
             None => cache,
@@ -293,12 +479,17 @@ fn save_cache(env: &Environment) -> bool {
         Some(ref s) => s,
         None => return false,
     };
-    let mut ok = create_dir(&cache_dir).is_ok();
+    let mut ok = create_dir(cache_dir).is_ok();
     ok = ok && create_dir(&cache_dir.join("lib")).is_ok();
     ok = ok && create_dir(&cache_dir.join("include")).is_ok();
 
     ok = ok && copy_file(&env.lib_dir.join(FLINT_LIB), &cache_dir.join(FLINT_LIB)).is_ok();
-    ok = ok && copy_file(&env.lib_dir.join("libextern.a"), &cache_dir.join("lib").join("libextern.a")).is_ok();
+    ok = ok
+        && copy_file(
+            &env.lib_dir.join("libextern.a"),
+            &cache_dir.join("lib").join("libextern.a"),
+        )
+        .is_ok();
 
     for h in FLINT_HEADERS {
         ok = ok && copy_file(&env.include_dir.join(h), &cache_dir.join("include").join(h)).is_ok();
@@ -313,7 +504,12 @@ fn load_cache(env: &Environment) -> bool {
     };
     let mut ok = true;
     ok = ok && copy_file(&cache_dir.join(FLINT_LIB), &env.lib_dir.join(FLINT_LIB)).is_ok();
-    ok = ok && copy_file(&cache_dir.join("lib").join("libextern.a"), &env.lib_dir.join("libextern.a")).is_ok();
+    ok = ok
+        && copy_file(
+            &cache_dir.join("lib").join("libextern.a"),
+            &env.lib_dir.join("libextern.a"),
+        )
+        .is_ok();
 
     for h in FLINT_HEADERS {
         ok = ok && copy_file(&cache_dir.join("include").join(h), &env.include_dir.join(h)).is_ok();
@@ -338,17 +534,17 @@ fn should_save_cache(env: &Environment) -> bool {
 
 fn build(env: &Environment) {
     println!("$ cd {:?}", &env.build_dir);
-    let conf = String::from(format!(
+    let conf = format!(
         r#"./configure --disable-shared --with-mpfr={} --with-gmp={} CFLAGS="-fPIC""#,
         env.gmp_mpfr_dir.display(),
         env.gmp_mpfr_dir.display(),
-    ));
+    );
 
     configure(&env.build_dir, &OsString::from(conf));
     make_and_check(env, &env.build_dir);
 
     let build_lib = &env.build_dir.join(FLINT_LIB);
-    copy_file_or_panic(&build_lib, &env.lib_dir.join(FLINT_LIB));
+    copy_file_or_panic(build_lib, &env.lib_dir.join(FLINT_LIB));
 
     let src = env.build_dir.join("src");
     for h in FLINT_HEADERS {
@@ -364,40 +560,43 @@ fn build_extern(env: &Environment) {
 
     // Compile the generated wrappers into an object file.
     let clang_output = std::process::Command::new("clang")
-        // TODO: -flto=thin causes a lot of problems, needs lld linker isntead of ld for some 
-        // reason and setting this in .cargo/config doesn't seem to be respected by cargo test, so 
+        // TODO: -flto=thin causes a lot of problems, needs lld linker isntead of ld for some
+        // reason and setting this in .cargo/config doesn't seem to be respected by cargo test, so
         // tests break. See https://github.com/rust-lang/rust-bindgen/discussions/2405
         //.arg("-flto=thin")
         .arg("-O")
         .arg("-c")
         .arg("-o")
-        .arg(&obj_path)
+        .arg(obj_path)
         .arg(env.src_dir.join("C").join("extern.c"))
         .arg(format!("-I{}", env.gmp_mpfr_dir.join("include").display()))
         .arg(format!("-I{}", env.include_dir.display()))
         .arg("-fPIC")
         .output()
         .expect("Could not compile object file.");
-    
+
     if !clang_output.status.success() {
         panic!(
             "Could not compile object file:\n{}",
             String::from_utf8_lossy(&clang_output.stderr)
         );
     }
-    
+
     // Turn the object file into a static library
     #[cfg(not(target_os = "windows"))]
     let lib_output = Command::new("ar")
         .arg("crus")
-        .arg(&lib_path)
+        .arg(lib_path)
         .arg(obj_path)
         .output()
         .expect("Could not build static library extern.");
     #[cfg(target_os = "windows")]
     let lib_output = Command::new("LIB")
         .arg(obj_path)
-        .arg(format!("/OUT:{}", env.lib_dir.join("libextern.a").display()))
+        .arg(format!(
+            "/OUT:{}",
+            env.lib_dir.join("libextern.a").display()
+        ))
         .output()
         .expect("Could not build static library extern.");
     if !lib_output.status.success() {
@@ -407,8 +606,6 @@ fn build_extern(env: &Environment) {
         );
     }
 }
-
-
 
 fn write_link_info(env: &Environment) {
     let out_str = env.out_dir.to_str().unwrap_or_else(|| {

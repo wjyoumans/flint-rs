@@ -13,15 +13,15 @@ if __name__ == '__main__':
     header_fns = []
 
     skip = [
-        "NTL-interface.h",
-        "crt_helpers.h",
-        "fft_small.h",
-        "longlong_asm_clang.h",
-        "longlong_asm_gcc.h",
-        "longlong_div_gnu.h",
-        "longlong_msc_arm64.h",
-        "longlong_msc_x86.h",
-        "machine_vectors.h"
+        # "NTL-interface.h",
+        # "crt_helpers.h",
+        # "fft_small.h",
+        # "gettimeofday.h",
+        # "longlong_asm_gcc.h",
+        # "longlong_msc_arm64.h",
+        # "longlong_msc_x86.h",
+        # "machine_vectors.h",
+        # "profiler.h"
     ]
 
 
